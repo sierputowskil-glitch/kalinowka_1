@@ -5,7 +5,6 @@
   "use strict";
   const $ = (s,c)=>(c||document).querySelector(s);
   const $$ = (s,c)=>Array.from((c||document).querySelectorAll(s));
-  const U = (id,w,q)=>`https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w||1200}&q=${q||80}`;
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------- year ---------- */
@@ -13,26 +12,29 @@
 
   /* ---------- HERO slideshow ---------- */
   const heroImgs = [
-    {src:'img/f/p27.jpg', alt:'Ceremonia ślubu plenerowego w ogrodzie Kalinówki, białe krzesła i kwiatowa brama'},
-    {src:'img/f/p33.jpg', alt:'Para młoda podczas ceremonii w ogrodzie Kalinówki'},
-    {src:'img/f/p74.jpg', alt:'Ślub plenerowy na trawniku Kalinówki na tle drewnianego budynku'},
-    {src:'img/f/p69.jpg', alt:'Stół Pary Młodej z kwiatową obręczą i lampkami w sali Kalinówki'},
-    {src:'img/f/p12.jpg', alt:'Wieczorny stół weselny z girlandą i świecami'}
+    {src:'/img/f/strefa-relaksu-ogrod-lezaki-kalinowka.webp', alt:'Strefa relaksu w ogrodzie Kalinówki: leżaki, poduszki i trawa pampasowa na trawniku'},
+    {src:'/img/f/ceremonia-plenerowa-biale-krzesla-kalinowka.webp', alt:'Ceremonia ślubu plenerowego w ogrodzie Kalinówki: białe krzesła, ślubna brama i drewniany budynek w tle'},
+    {src:'/img/f/budynek-kalinowki-wieczorem-kalinowka.webp', alt:'Drewniany budynek Kalinówki wśród lasu o zmierzchu, widok od strony ogrodu'},
+    {src:'/img/f/jasna-sala-weselna-okna-kalinowka.webp', alt:'Jasna sala z dużymi oknami i nakrytymi stołami w Kalinówce'},
+    {src:'/img/f/przyjecie-w-sali-weselnej-kalinowka.webp', alt:'Nakryte stoły z kwiatowymi dekoracjami w sali Kalinówki'}
   ];
   const slidesWrap = $('#heroSlides'), dotsWrap = $('#heroDots');
   heroImgs.forEach((im,i)=>{
+    if(i===0&&slidesWrap.firstElementChild){/* pierwszy slajd jest w HTML (LCP) */}
+    else{
     const d=document.createElement('div');
     d.className='hero-slide'+(i===0?' active':'');
     d.style.backgroundImage=`url('${im.src}')`;
     d.setAttribute('role','img'); d.setAttribute('aria-label',im.alt);
     slidesWrap.appendChild(d);
+    }
     const b=document.createElement('button');
     b.className=(i===0?'on':''); b.setAttribute('aria-label','Slajd '+(i+1));
     b.addEventListener('click',()=>go(i));
     dotsWrap.appendChild(b);
   });
   // preload
-  heroImgs.slice(1).forEach(im=>{const x=new Image();x.src=im.src;});
+  window.addEventListener('load',()=>setTimeout(()=>heroImgs.slice(1).forEach(im=>{const x=new Image();x.src=im.src;}),1500));
   let hi=0, htimer;
   const slides=$$('.hero-slide',slidesWrap), dots=$$('button',dotsWrap);
   function go(n){
@@ -53,6 +55,8 @@
     if(y>40) nav.classList.add('solid'); else nav.classList.remove('solid');
     if(y>heroBottom-200) nav.classList.remove('over-hero'); else nav.classList.add('over-hero');
     if(y>window.innerHeight*0.9) sticky.classList.add('show'); else sticky.classList.remove('show');
+    document.body.classList.toggle('has-sticky',y>window.innerHeight*0.9);
+    const tt=$('#toTop'); if(tt) tt.classList.toggle('show',y>window.innerHeight*0.6);
     revealCheck();
     // parallax
     $$('[data-parallax]').forEach(el=>{
@@ -74,6 +78,7 @@
     });
     return remaining;
   }
+  const toTop=$('#toTop'); if(toTop) toTop.addEventListener('click',()=>window.scrollTo({top:0,behavior:reduce?'auto':'smooth'}));
   window.addEventListener('scroll',onScroll,{passive:true});
   window.addEventListener('resize',()=>{onScroll();},{passive:true});
   onScroll();
@@ -107,40 +112,40 @@
 
   /* ---------- GALLERY ---------- */
   const gallery=[
-    {p:'p27',cat:'plener',t:'Ceremonia w ogrodzie',r:1.499},
-    {p:'p28',cat:'plener',t:'Ślub plenerowy nad rzeką',r:1.499},
-    {p:'p74',cat:'plener',t:'Ceremonia na trawniku',r:0.75},
-    {p:'p33',cat:'realizacje',t:'Para Młoda w ogrodzie',r:1.499},
-    {p:'p07',cat:'ogrod',t:'Krzesła w ogrodzie',r:1.499},
-    {p:'p05',cat:'ogrod',t:'Kwiatowa brama ślubna',r:1.499},
-    {p:'p31',cat:'ogrod',t:'Budynek Kalinówki',r:0.667},
-    {p:'p36',cat:'ogrod',t:'Wejście wieczorem',r:1.499},
-    {p:'p02',cat:'ogrod',t:'Ogród z bramą',r:0.945},
-    {p:'p19',cat:'ogrod',t:'Strefa relaksu w ogrodzie',r:1.499},
-    {p:'p20',cat:'sala',t:'Drewniana sala z arkadą',r:1.499},
-    {p:'p64',cat:'sala',t:'Wejście na salę',r:0.75},
-    {p:'p16',cat:'sala',t:'Sala pod belkami',r:1.499},
-    {p:'p08',cat:'sala',t:'Sala w światłach lampek',r:0.75},
-    {p:'p10',cat:'sala',t:'Stoły weselne',r:1.499},
-    {p:'p34',cat:'sala',t:'Eleganckie nakrycia',r:0.75},
-    {p:'p60',cat:'sala',t:'Sala bankietowa',r:1.333},
-    {p:'p66',cat:'sala',t:'Sala dla gości',r:1.535},
-    {p:'p72',cat:'sala',t:'Wnętrze sali',r:0.75},
-    {p:'p65',cat:'sala',t:'Przyjęcie w sali',r:1.499},
-    {p:'p01',cat:'dekoracje',t:'Kompozycja kwiatowa',r:0.75},
-    {p:'p12',cat:'dekoracje',t:'Wieczorny stół ze świecami',r:1.499},
-    {p:'p15',cat:'dekoracje',t:'Świece i zieleń',r:0.75},
-    {p:'p17',cat:'dekoracje',t:'Kwiatowa obręcz',r:0.75},
-    {p:'p39',cat:'dekoracje',t:'Napis „Miłość”',r:1.499},
-    {p:'p56',cat:'dekoracje',t:'Stół Pary Młodej',r:1.333},
-    {p:'p57',cat:'dekoracje',t:'Ścianka kwiatowa',r:0.75},
-    {p:'p59',cat:'dekoracje',t:'Nakrycie stołu',r:1.153},
-    {p:'p69',cat:'dekoracje',t:'Stół z kwiatową obręczą',r:1.275},
-    {p:'p68',cat:'dekoracje',t:'Dekoracje stołu',r:0.932},
-    {p:'p75',cat:'dekoracje',t:'Krzesło z kwiatami',r:1.499},
-    {p:'p32',cat:'jedzenie',t:'Słodki stół',r:0.75},
-    {p:'p70',cat:'jedzenie',t:'Stół z przekąskami',r:1.333},
-    {p:'p71',cat:'jedzenie',t:'Bufet weselny',r:1.333}
+    {p:'ceremonia-plenerowa-biale-krzesla-kalinowka',cat:'plener',t:'Ceremonia w ogrodzie',a:'Ceremonia ślubu plenerowego w ogrodzie Kalinówki: białe krzesła, ślubna brama i drewniany budynek w tle',r:1.499},
+    {p:'slub-plenerowy-ustawienie-krzesel-kalinowka',cat:'plener',t:'Ślub plenerowy nad rzeką',a:'Krzesła ustawione do ślubu plenerowego na trawniku Kalinówki, w tle ogród i las',r:1.499},
+    {p:'slub-plenerowy-trawnik-krzesla-kalinowka',cat:'plener',t:'Ceremonia na trawniku',a:'Ślub plenerowy: rzędy białych krzeseł na trawniku w ogrodzie Kalinówki',r:0.75},
+    {p:'para-mloda-ceremonia-ogrod-kalinowka',cat:'realizacje',t:'Para Młoda w ogrodzie',a:'Para Młoda podczas ceremonii ślubnej w ogrodzie Kalinówki, w tle białe krzesła',r:1.499},
+    {p:'okragla-brama-slubna-bialeskrzesla-kalinowka',cat:'ogrod',t:'Krzesła w ogrodzie',a:'Białe krzesła i okrągła brama ślubna na trawniku w ogrodzie Kalinówki, ceremonia plenerowa w Gdańsku',r:1.499},
+    {p:'budynek-kalinowki-wieczorem-kalinowka',cat:'ogrod',t:'Kwiatowa brama ślubna',a:'Drewniany budynek Kalinówki wśród lasu o zmierzchu, widok od strony ogrodu',r:1.499},
+    {p:'budynek-kalinowki-sciezka-kalinowka',cat:'ogrod',t:'Budynek Kalinówki',a:'Drewniany budynek Kalinówki ze szklaną werandą i ścieżką w otoczeniu zieleni',r:0.667},
+    {p:'wejscie-taras-wieczorem-kalinowka',cat:'ogrod',t:'Wejście wieczorem',a:'Oświetlone wejście i taras Kalinówki wieczorem, z lampionami',r:1.499},
+    {p:'kwiatowa-brama-slubna-ogrod-kalinowka',cat:'ogrod',t:'Ogród z bramą',a:'Kwiatowa brama i krzesła ustawione na trawniku do ceremonii ślubnej w ogrodzie Kalinówki w Gdańsku',r:0.945},
+    {p:'strefa-relaksu-ogrod-lezaki-kalinowka',cat:'ogrod',t:'Strefa relaksu w ogrodzie',a:'Strefa relaksu w ogrodzie Kalinówki: leżaki, poduszki i trawa pampasowa na trawniku',r:1.499},
+    {p:'jasna-sala-weselna-okna-kalinowka',cat:'sala',t:'Drewniana sala z arkadą',a:'Jasna sala weselna z dużymi oknami i nakrytymi stołami w Kalinówce',r:1.499},
+    {p:'wejscie-na-sale-weselna-kalinowka',cat:'sala',t:'Wejście na salę',a:'Widok z wejścia na salę weselną Kalinówki przez drewniane drzwi z zasłonami',r:0.75},
+    {p:'sala-kominek-drewniane-belki-kalinowka',cat:'sala',t:'Sala pod belkami',a:'Wnętrze sali Kalinówki z drewnianymi belkami, kominkiem i nakrytym okrągłym stołem',r:1.499},
+    {p:'sala-weselna-draperie-girlandy-kalinowka',cat:'sala',t:'Sala w światłach lampek',a:'Sala weselna Kalinówki z białymi draperiami, zielonymi girlandami i okrągłymi stołami',r:0.75},
+    {p:'stol-pary-mlodej-girlandy-kalinowka',cat:'sala',t:'Stoły weselne',a:'Stół Pary Młodej ozdobiony zielonymi girlandami w sali weselnej Kalinówki',r:1.499},
+    {p:'stol-granatowy-obrus-sala-kalinowka',cat:'sala',t:'Eleganckie nakrycia',a:'Okrągły stół weselny z granatowym obrusem i drewnianymi krzesłami w sali z draperiami',r:0.75},
+    {p:'sala-bankietowa-draperie-kalinowka',cat:'sala',t:'Sala bankietowa',a:'Sala bankietowa Kalinówki z nakrytymi stołami pod białymi draperiami',r:1.333},
+    {p:'sala-dla-gosci-wysokie-bukiety-kalinowka',cat:'sala',t:'Sala dla gości',a:'Okrągłe stoły dla gości z wysokimi bukietami w sali weselnej Kalinówki',r:1.535},
+    {p:'bukiet-kwiatow-na-stole-kalinowka',cat:'sala',t:'Wnętrze sali',a:'Bukiet kolorowych kwiatów na nakrytym stole w sali weselnej Kalinówki',r:0.75},
+    {p:'przyjecie-w-sali-weselnej-kalinowka',cat:'sala',t:'Przyjęcie w sali',a:'Nakryte stoły z kwiatowymi dekoracjami w sali weselnej Kalinówki',r:1.499},
+    {p:'kompozycja-kwiatowa-stol-weselny-kalinowka',cat:'dekoracje',t:'Kompozycja kwiatowa',a:'Kompozycja z kolorowych kwiatów i świec na stole weselnym przed ścianką z lampkami w sali Kalinówki',r:0.75},
+    {p:'bufet-przy-oknach-wieczorem-kalinowka',cat:'dekoracje',t:'Wieczorny stół ze świecami',a:'Bufet z przekąskami i lampkami przy dużych oknach sali weselnej, widok wieczorem',r:1.499},
+    {p:'stol-weselny-swiece-zielen-kalinowka',cat:'dekoracje',t:'Świece i zieleń',a:'Nakryty stół weselny ze świecami i wysoką zieloną dekoracją w sali Kalinówki',r:0.75},
+    {p:'kwiatowa-obrecz-stol-pary-mlodej-kalinowka',cat:'dekoracje',t:'Kwiatowa obręcz',a:'Kwiatowa obręcz z zieleni za stołem Pary Młodej w sali z białymi draperiami',r:0.75},
+    {p:'napis-milosc-wesele-kalinowka',cat:'dekoracje',t:'Napis „Miłość”',a:'Podświetlany napis MIŁOŚĆ na przyjęciu weselnym w Kalinówce',r:1.499},
+    {p:'stol-pary-mlodej-kolorowe-kwiaty-kalinowka',cat:'dekoracje',t:'Stół Pary Młodej',a:'Stół Pary Młodej z bukietami kolorowych kwiatów i napisem Zakochani na jasnej ścianie',r:1.333},
+    {p:'scianka-kwiatowa-neon-kalinowka',cat:'dekoracje',t:'Ścianka kwiatowa',a:'Kwiatowa ścianka w kształcie obręczy z neonem, dekoracja wesela w Kalinówce',r:0.75},
+    {p:'nakrycie-stolu-weselnego-zlote-talerze-kalinowka',cat:'dekoracje',t:'Nakrycie stołu',a:'Nakrycie okrągłego stołu weselnego z różowymi serwetkami, złotymi talerzami i numerem stołu',r:1.153},
+    {p:'stol-weselny-zlota-obrecz-kalinowka',cat:'dekoracje',t:'Stół z kwiatową obręczą',a:'Stół weselny przed złotą kwiatową obręczą i ścianką ze światełkami',r:1.275},
+    {p:'dekoracja-stolu-roze-suszone-kwiaty-kalinowka',cat:'dekoracje',t:'Dekoracje stołu',a:'Dekoracja stołu weselnego z różami i suszonymi kwiatami, w tle ścianka ze światełkami',r:0.932},
+    {p:'krzeslo-slubne-wstazki-zielen-kalinowka',cat:'dekoracje',t:'Krzesło z kwiatami',a:'Krzesło ślubne przystrojone wstążkami i zielonym wiankiem z kwiatami',r:1.499},
+    {p:'slodki-stol-ciasta-paczki-kalinowka',cat:'jedzenie',t:'Słodki stół',a:'Słodki stół z ciastami, eklerkami i ścianką z pączkami na przyjęciu w Kalinówce',r:0.75},
+    {p:'stol-z-wedlinami-pieczywem-kalinowka',cat:'jedzenie',t:'Stół z przekąskami',a:'Stół z wędlinami, pieczywem i przekąskami w wiejskim stylu na przyjęciu w Kalinówce',r:1.333},
+    {p:'bukiety-polnych-kwiatow-sala-kalinowka',cat:'jedzenie',t:'Bufet weselny',a:'Kolorowe bukiety polnych kwiatów na stołach w sali weselnej Kalinówki',r:1.333}
   ];
   const catLabels={all:'Wszystko',sala:'Sala',ogrod:'Ogród',plener:'Śluby plenerowe',dekoracje:'Dekoracje',jedzenie:'Jedzenie',realizacje:'Realizacje'};
   const filterWrap=$('#galleryFilters'), masonry=$('#masonry');
@@ -152,7 +157,7 @@
   gallery.forEach((g,i)=>{
     const a=document.createElement('a');
     a.href='#'; a.className='m-item'; a.dataset.cat=g.cat; a.dataset.idx=i;
-    a.innerHTML=`<img loading="lazy" style="aspect-ratio:${g.r||1.3}" alt="${g.t} — Kalinówka, sala weselna Gdańsk" src="img/t/${g.p}.jpg"><span class="m-cat">${catLabels[g.cat]}</span>`;
+    a.innerHTML=`<img loading="lazy" style="aspect-ratio:${g.r||1.3}" alt="${g.a||g.t}" src="/img/t/${g.p}.webp"><span class="m-cat">${catLabels[g.cat]}</span>`;
     masonry.appendChild(a);
   });
   filterWrap.addEventListener('click',e=>{
@@ -175,7 +180,7 @@
   }
   function showLb(){
     const it=curList[curIdx]; const gi=gallery[+it.dataset.idx];
-    lbImg.src=`img/f/${gi.p}.jpg`; lbImg.alt=gi.t; lbCap.textContent=gi.t;
+    lbImg.src=`/img/f/${gi.p}.webp`; lbImg.alt=gi.a||gi.t; lbCap.textContent=gi.t;
   }
   masonry.addEventListener('click',e=>{
     const it=e.target.closest('.m-item'); if(!it)return; e.preventDefault();
@@ -189,22 +194,8 @@
   lb.addEventListener('click',e=>{if(e.target===lb)closeLb();});
 
   /* ---------- REVIEWS ---------- */
-  const reviews=[
-    {q:'Marzyliśmy o ślubie w ogrodzie i Kalinówka spełniła to w 100%. Ceremonia nad rzeką, światło między drzewami — goście do dziś o tym mówią.',n:'Ania & Marek',d:'Wesele · czerwiec 2024',av:'p33'},
-    {q:'Kameralnie, elegancko i z ogromnym sercem. Domowa kuchnia zachwyciła wszystkich, a obsługa zadbała o każdy detal.',n:'Kasia & Tomek',d:'Wesele · wrzesień 2024',av:'p59'},
-    {q:'Najpiękniejsze miejsce na ślub plenerowy w Trójmieście. Blisko centrum, a czuliśmy się jak za miastem, w otoczeniu zieleni.',n:'Magda & Paweł',d:'Ślub plenerowy · lipiec 2023',av:'p27'},
-    {q:'Plan B okazał się równie piękny jak A — deszcz nas nie wystraszył. Profesjonalizm i spokój gospodarzy to skarb.',n:'Ewa & Krzysztof',d:'Wesele · maj 2024',av:'p69'},
-    {q:'Prywatność, natura i klimat, którego nie znaleźliśmy nigdzie indziej. Polecamy każdej parze szukającej czegoś wyjątkowego.',n:'Ola & Bartek',d:'Wesele · sierpień 2023',av:'p74'},
-    {q:'Organizacja od A do Z, świetna współpraca z florystką i fotografem. Mogliśmy po prostu cieszyć się swoim dniem.',n:'Natalia & Michał',d:'Wesele · październik 2024',av:'p57'}
-  ];
   const track=$('#reviewTrack');
-  reviews.forEach(r=>{
-    const c=document.createElement('div'); c.className='review-card';
-    c.innerHTML=`<div class="stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></div>
-      <p class="quote">„${r.q}”</p>
-      <div class="who"><span class="av" style="background-image:url('img/t/${r.av}.jpg')"></span><span><span class="nm">${r.n}</span><br><span class="dt">${r.d}</span></span></div>`;
-    track.appendChild(c);
-  });
+  const reviews=$$('.review-card',track);
   let rIdx=0;
   function perView(){return window.innerWidth<=640?1:(window.innerWidth<=980?2:3);}
   function reviewMove(){
@@ -220,54 +211,23 @@
   reviewMove();
 
   /* ---------- FAQ ---------- */
-  const faqs=[
-    ['Ile kosztuje wesele w Gdańsku?','Koszt wesela zależy od liczby gości, wybranego menu i dodatków. W Kalinówce przygotowujemy indywidualną wycenę — wyślij zapytanie z datą i liczbą gości, a przedstawimy wstępną propozycję dopasowaną do Waszych oczekiwań.'],
-    ['Ile osób pomieści sala?','Komfortowo organizujemy przyjęcia weselne do około 150 gości. Świetnie sprawdzamy się również przy kameralnych weselach w mniejszym gronie.'],
-    ['Czy organizujecie śluby plenerowe?','Tak. Oferujemy ceremonie plenerowe na trawniku oraz na tarasach nad rzeką Strzyżą. W Kalinówce ceremonia w plenerze nie wiąże się z dodatkowymi kosztami.'],
-    ['Czy można zorganizować ceremonię i wesele w jednym miejscu?','Oczywiście. Ceremonia odbywa się w ogrodzie lub na tarasie, a przyjęcie tuż obok — bez przejazdów i bez pośpiechu dla Was i Waszych gości.'],
-    ['Czy jest parking?','Tak, na terenie obiektu znajduje się wygodny parking dla gości.'],
-    ['Jak wygląda menu weselne?','Stawiamy na domową kuchnię — m.in. własnoręcznie przygotowywany makaron, sezonowe dania, desery i ciasta. Menu ustalamy indywidualnie.'],
-    ['Czy można ustalić indywidualne menu?','Tak. Każde menu układamy wspólnie z Parą Młodą, uwzględniając preferencje smakowe, diety i pomysły gości.'],
-    ['Czy jest plan B przy złej pogodzie?','Tak. W razie niepogody elegancko przenosimy ceremonię i przyjęcie pod dach — bez stresu i bez utraty klimatu.'],
-    ['Czy można obejrzeć salę przed rezerwacją?','Zdecydowanie zachęcamy. Umów się na prezentację — oprowadzimy Cię po sali i terenie oraz omówimy szczegóły oferty.'],
-    ['Jak zarezerwować termin?','Wyślij zapytanie z datą i liczbą gości. Oddzwonimy z informacją o dostępności, zaprosimy na prezentację i wspólnie zarezerwujemy termin.'],
-    ['Czy organizujecie małe, kameralne wesela?','Tak. Kameralny klimat Kalinówki sprawia, że małe wesela wychodzą u nas wyjątkowo pięknie.'],
-    ['Czy organizujecie przyjęcia firmowe?','Tak — spotkania firmowe, imprezy integracyjne i eventy biznesowe. Lokalizacja i zaplecze świetnie się do tego nadają.'],
-    ['Czy można zorganizować chrzciny lub komunię?','Tak. Chrzty, komunie i inne uroczystości rodzinne organizujemy z domową kuchnią, a przy ładnej pogodzie z ogrodem i tarasami.'],
-    ['Gdzie dokładnie znajduje się Kalinówka?','Mieścimy się przy ul. Potokowej 15 f w Gdańsku Matemblewie, w otoczeniu zieleni nad rzeką Strzyżą.'],
-    ['Jak daleko jest od centrum Gdańska?','To zaledwie kilka minut od centrum Gdańska, z dogodnym dojazdem z całego Trójmiasta.'],
-    ['Czy obiekt znajduje się blisko natury?','Tak — Kalinówka jest otoczona zielenią, ogrodem i tarasami nad rzeką, a mimo to pozostaje blisko miasta.'],
-    ['Czy można zrobić sesję zdjęciową na miejscu?','Oczywiście. Ogród, tarasy i nadrzeczna sceneria to wymarzone tło dla sesji ślubnej.'],
-    ['Czy są tarasy lub ogród dla gości?','Tak. Goście mają do dyspozycji ogród oraz tarasy nad rzeką Strzyżą.'],
-    ['Czy można zorganizować wesele w stylu boho, glamour lub rustykalnym?','Tak. Współpracujemy z dekoratorami i florystami, którzy pomogą zrealizować dowolną stylistykę — od boho i rustykalnego po glamour.'],
-    ['Z jakim wyprzedzeniem warto rezerwować termin?','Najlepsze terminy w sezonie rezerwowane są nawet z rocznym lub dłuższym wyprzedzeniem. Im wcześniej się odezwiesz, tym większy wybór dat.']
-  ];
   const faqWrap=$('#faqList');
-  faqs.forEach(([q,a])=>{
-    const item=document.createElement('div'); item.className='faq-item';
-    item.innerHTML=`<button class="faq-q" type="button"><span>${q}</span><span class="pm"></span></button><div class="faq-a"><div class="faq-a-inner">${a}</div></div>`;
-    faqWrap.appendChild(item);
-  });
   faqWrap.addEventListener('click',e=>{
     const btn=e.target.closest('.faq-q'); if(!btn)return;
     const item=btn.parentElement; const ans=item.querySelector('.faq-a');
     const open=item.classList.contains('open');
     if(open){item.classList.remove('open');ans.style.maxHeight=null;}
     else{item.classList.add('open');ans.style.maxHeight=ans.scrollHeight+'px';}
-  });
-  // FAQ schema
-  $('#faq-schema').textContent=JSON.stringify({
-    "@context":"https://schema.org","@type":"FAQPage",
-    "mainEntity":faqs.map(([q,a])=>({"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}}))
+    btn.setAttribute('aria-expanded',open?'false':'true');
   });
 
   /* ---------- VIDEO MODAL ---------- */
   const vmodal=$('#vmodal'), vmShow=$('#vmShow');
-  const vmImgs=['p27','p33','p28','p39','p12','p69'];
+  const vmImgs=['strefa-relaksu-ogrod-lezaki-kalinowka','ceremonia-plenerowa-biale-krzesla-kalinowka','jasna-sala-weselna-okna-kalinowka','budynek-kalinowki-wieczorem-kalinowka','wejscie-taras-wieczorem-kalinowka','stol-z-wedlinami-pieczywem-kalinowka','slodki-stol-ciasta-paczki-kalinowka'];
   let vmBuilt=false, vmI=0, vmTimer;
   function buildVm(){
     if(vmBuilt)return; vmBuilt=true;
-    vmImgs.forEach((id,i)=>{const s=document.createElement('div');s.className='vslide'+(i===0?' on':'');s.style.backgroundImage=`url('img/f/${id}.jpg')`;vmShow.appendChild(s);});
+    vmImgs.forEach((id,i)=>{const s=document.createElement('div');s.className='vslide'+(i===0?' on':'');s.style.backgroundImage=`url('/img/f/${id}.webp')`;vmShow.appendChild(s);});
   }
   function openVm(){
     buildVm(); vmodal.classList.add('open'); vmodal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
@@ -290,7 +250,7 @@
   function validate(form){
     let ok=true;
     $$('[required]',form).forEach(inp=>{
-      const field=inp.closest('.field'); let bad=!inp.value.trim();
+      const field=inp.closest('.field'); let bad=inp.type==='checkbox'?!inp.checked:!inp.value.trim();
       if(inp.type==='email' && inp.value.trim()){bad=!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inp.value);}
       field.classList.toggle('invalid',bad); if(bad)ok=false;
     });
@@ -311,6 +271,7 @@
     if(!validate(lead))return;
     // prefill booking form
     const map={date:'#b-date',guests:'#b-guests',name:'#b-name',phone:'#b-phone',email:'#b-email'};
+    const bc=$('#b-consent'), lc=$('#l-consent'); if(bc&&lc) bc.checked=lc.checked;
     Object.entries(map).forEach(([k,sel])=>{const src=lead.querySelector(`[name="${k}"]`);const dst=$(sel);if(src&&dst&&src.value)dst.value=src.value;});
     document.getElementById('termin').scrollIntoView({behavior:reduce?'auto':'smooth'});
     setTimeout(()=>submitBooking(true),reduce?0:700);
@@ -319,10 +280,46 @@
   // booking form
   const booking=$('#bookingForm'), thanks=$('#bookingThanks');
   liveClear(booking);
-  function submitBooking(prefilled){
-    if(!validate(booking)){if(!prefilled)booking.querySelector('.invalid')?.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  // Endpoint formularza (np. Formspree) ustawiany w <meta name="form-endpoint">.
+  // Bez endpointu zapytanie otwiera się w programie pocztowym (mailto) - nic nie jest "udawane".
+  const ENDPOINT=(document.querySelector('meta[name="form-endpoint"]')||{}).content||'';
+  const MAIL='kontakt@kalinowka.com.pl';
+  function showError(msg){
+    let p=$('.form-error',booking);
+    if(!p){p=document.createElement('p');p.className='form-error';p.setAttribute('role','alert');p.style.cssText='color:#8a2b1f;margin:12px 0 0;font-size:15px';booking.appendChild(p);}
+    p.textContent=msg;
+  }
+  function showThanks(){
+    if(window.gtag)window.gtag('event','generate_lead',{form:'zapytanie'});
     booking.style.display='none'; thanks.classList.add('show');
     thanks.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});
+  }
+  let tokCache=null;
+  async function getToken(){
+    if(tokCache&&Date.now()-tokCache.at<6000000)return tokCache.tok;
+    try{const r=await fetch(ENDPOINT+'?t=1',{headers:{'Accept':'application/json'}});const j=await r.json();if(j.tok){tokCache={tok:j.tok,at:Date.now()};return j.tok;}}catch(e){}
+    return '';
+  }
+  if(ENDPOINT)getToken();
+  async function submitBooking(prefilled){
+    if(!validate(booking)){if(!prefilled)booking.querySelector('.invalid')?.scrollIntoView({behavior:'smooth',block:'center'});return;}
+    const data=new FormData(booking);
+    if(ENDPOINT)data.append('tok',await getToken());
+    const btn=$('button[type="submit"]',booking); if(btn)btn.disabled=true;
+    try{
+      if(ENDPOINT){
+        const r=await fetch(ENDPOINT,{method:'POST',body:data,headers:{'Accept':'application/json'}});
+        const j=await r.json().catch(()=>({}));
+        if(!r.ok||!j.ok){showError(j.error||'Nie udało się wysłać zapytania. Zadzwoń: 501 743 517 lub napisz na '+MAIL+'.');return;}
+        showThanks();
+      }else{
+        const body=['Imię i nazwisko','Telefon','E-mail','Data','Liczba gości','Typ wydarzenia','Wiadomość']
+          .map((l,i)=>l+': '+(data.get(['name','phone','email','date','guests','type','message'][i])||'')).join('\n');
+        location.href='mailto:'+MAIL+'?subject='+encodeURIComponent('Zapytanie o termin')+'&body='+encodeURIComponent(body);
+      }
+    }catch(err){
+      showError('Nie udało się wysłać zapytania. Zadzwoń: 501 743 517 lub napisz na '+MAIL+'.');
+    }finally{if(btn)btn.disabled=false;}
   }
   booking.addEventListener('submit',e=>{e.preventDefault();submitBooking(false);});
 

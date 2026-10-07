@@ -28,7 +28,10 @@
     const limit=ph?ph.offsetHeight-120:160;
     if(y>limit) nav.classList.remove('over-hero'); else nav.classList.add('over-hero');
   }
-  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+  const toTop=$('#toTop');
+  function topBtn(){ if(toTop) toTop.classList.toggle('show',window.scrollY>innerHeight*0.6); }
+  if(toTop) toTop.addEventListener('click',()=>window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
+  window.addEventListener('scroll',()=>{onScroll();topBtn();},{passive:true}); onScroll(); topBtn();
 
   // reveal
   function revealCheck(){const vh=innerHeight;let rem=0;$$('.reveal').forEach(el=>{if(el.classList.contains('in'))return;const r=el.getBoundingClientRect();if(r.top<vh*0.92&&r.bottom>0)el.classList.add('in');else rem++;});return rem;}
